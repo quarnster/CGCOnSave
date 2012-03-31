@@ -36,8 +36,9 @@ def compile(cmd):
     stdout, stderr = p.communicate()
     sublime.set_timeout(show_panel, 0)
 
-fragmentExtensions = [".glslf", ".frag", ".fs"]
-vertexExtensions = [".glslv", ".vert", ".vs"]
+
+def get_cgc(view):
+    return "%s %s" % (view.settings().get("cgc_binary", "cgc"), view.settings().get("cgc_args", "-nocode -ogles"))
 
 
 class CGCCompile(sublime_plugin.EventListener):
@@ -47,11 +48,11 @@ class CGCCompile(sublime_plugin.EventListener):
         if idx != -1:
             ext = fn[idx:]
             cmd = None
-            if ext in fragmentExtensions:
-                cmd = "cgc -nocode -ogles -profile fp40 %s" % fn
+            if ext in view.settings().get("cgc_fragment_extensions", [".glslf", ".frag", ".fs"]):
+                cmd = "%s %s %s" % (get_cgc(view), view.settings().get("cgc_fragment_args", "-profile fp40"), fn)
                 cmd = cmd.split()
-            elif ext in vertexExtensions:
-                cmd = "cgc -nocode -ogles -profile vp40 %s" % fn
+            elif ext in view.settings().get("cgc_vertex_extensions", [".glslv", ".vert", ".vs"]):
+                cmd = "%s %s %s" % (get_cgc(view), view.settings().get("cgc_vertex_args", "-profile vp40"), fn)
                 cmd = cmd.split()
 
             if not cmd is None:

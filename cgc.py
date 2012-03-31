@@ -37,10 +37,6 @@ def compile(cmd):
     sublime.set_timeout(show_panel, 0)
 
 
-def get_cgc(view):
-    return "%s %s" % (view.settings().get("cgc_binary", "cgc"), view.settings().get("cgc_args", "-nocode -ogles"))
-
-
 class CGCCompile(sublime_plugin.EventListener):
     def on_post_save(self, view):
         fn = view.file_name()
@@ -49,10 +45,10 @@ class CGCCompile(sublime_plugin.EventListener):
             ext = fn[idx:]
             cmd = None
             if ext in view.settings().get("cgc_fragment_extensions", [".glslf", ".frag", ".fs"]):
-                cmd = "%s %s %s" % (get_cgc(view), view.settings().get("cgc_fragment_args", "-profile fp40"), fn)
+                cmd = "%s %s" % (view.settings().get("cgc_fragment_cmd", "cgc -nocode -ogles -profile fp40"), fn)
                 cmd = cmd.split()
             elif ext in view.settings().get("cgc_vertex_extensions", [".glslv", ".vert", ".vs"]):
-                cmd = "%s %s %s" % (get_cgc(view), view.settings().get("cgc_vertex_args", "-profile vp40"), fn)
+                cmd = "%s %s" % (view.settings().get("cgc_vertex_cmd", "cgc -nocode -ogles -profile vp40"), fn)
                 cmd = cmd.split()
 
             if not cmd is None:

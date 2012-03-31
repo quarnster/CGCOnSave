@@ -10,8 +10,9 @@ stderr = ""
 def show_panel():
     view = sublime.active_window().active_view()
     if len(stderr) > 0:
-        if stderr.count("\n") == 1:
+        if stderr.count("\n") == 1 and "0 errors" in stderr:
             sublime.status_message("CGC: %s" % stderr)
+            view.window().run_command("hide_panel", {"panel": "output.cgc"})
             return
         v = view.window().get_output_panel("cgc")
         v.settings().set("result_file_regex", "^(.+)\((\d+)\)")
@@ -23,6 +24,8 @@ def show_panel():
         v.end_edit(e)
         v.set_read_only(True)
         view.window().run_command("show_panel", {"panel": "output.cgc"})
+    else:
+        view.window().run_command("hide_panel", {"panel": "output.cgc"})
 
 
 def compile(cmd):
